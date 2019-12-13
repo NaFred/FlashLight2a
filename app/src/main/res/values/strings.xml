@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">FlashLight</string>
+    <string name="TextView">BlaBla</string>
+    <string name="buttonWhite">Button</string>
+    <string name="buttonRed">R</string>
+    <string name="w">W</string>
+    <string name="buttonGreen">G</string>
+    <string name="buttonYellow">Y</string>
+    <string name="buttonBlack">B</string>
+    <string name="new_game" />
+</resources>
