@@ -3,6 +3,9 @@ package com.example.flashlight;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -10,10 +13,12 @@ import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Layout;
 import android.view.ActionProvider;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +29,14 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView textView;
     private LinearLayout buttonLayout;
-    private Menu menu;
+    private LinearLayout layoutTest;
+
+    private Button buttonBlack, buttonWhite, buttonRed, buttonGreen, buttonYellow;
+    private Button hidden, visible, cancel;
+
+    final Context context = this;
+
+    //private Menu menu;
     //private String versionInfo;
 
     //OnCreate
@@ -34,29 +46,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.onCreateOptionsMenu(menu);
+        //menu-points for drop down menu
+        //super.onCreateOptionsMenu(menu);
         setContentView(R.layout.activity_main);
+
+        //Init the Main Screen
         textView = findViewById(R.id.textView);
+        //tap on background
+        textView.setOnClickListener(this);
+
+        //init buttonLayout
         buttonLayout =(LinearLayout)findViewById(R.id.LayoutButtons);
 
-        final Button buttonWhite = findViewById(R.id.buttonWhite);
-        final Button buttonBlack = findViewById(R.id.buttonBlack);
-        final Button buttonRed = findViewById(R.id.buttonRed);
-        final Button buttonYellow = findViewById(R.id.buttonYellow);
-        final Button buttonGreen = findViewById(R.id. buttonGreen);
+        //init all Buttons and tab on buttons
+        initButtons();
 
-        if(savedInstanceState == null){
+        //open dialog
+        openDialog(context);
+
+        //On first start of the app
+        if (savedInstanceState == null) {
+            //set initial values on first start
             textView.setBackgroundColor(0);
             buttonLayout.setVisibility(View.VISIBLE);
-        }else{
+        } else {
+            //read out all information stored
             textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));
             buttonLayout.setVisibility(savedInstanceState.getInt("visibilityButtons"));
             textView.setText(savedInstanceState.getCharSequence("visibilityText"));
         }
 
-        //tap on background
-        textView.setOnClickListener(this);
-        //tab on buttons
+
+        //layoutTest=(LinearLayout)findViewById(R.id.layouttest);
+    }
+
+
+
+    public void initButtons(){
+        buttonWhite = findViewById(R.id.buttonWhite);
+        buttonBlack = findViewById(R.id.buttonBlack);
+        buttonRed = findViewById(R.id.buttonRed);
+        buttonYellow = findViewById(R.id.buttonYellow);
+        buttonGreen = findViewById(R.id. buttonGreen);
+
         buttonWhite.setOnClickListener(this);
         buttonBlack.setOnClickListener(this);
         buttonRed.setOnClickListener(this);
@@ -64,13 +96,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonGreen.setOnClickListener(this);
 
     }
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
-
+*/
     /*
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item){
@@ -84,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     */
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -100,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return super.onOptionsItemSelected(item);
         }
     }
+
+     */
 
 
 
@@ -171,8 +207,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         
     }
 
-
-
     /**
      *
      * @param view
@@ -184,15 +218,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonLayout.setVisibility(view.GONE);
         }
     }
-    
-    private String myVersionInfo(){
-        String versionInfo;
-        try{
-            versionInfo = getPackageManager().getPackageInfo(getPackageName(),0).versionName;
-        }catch (PackageManager.NameNotFoundException e){
-            versionInfo = "not available!";
-        }
-        return versionInfo;
+
+    public void openDialog(Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.menu);
+        hidden = dialog.findViewById(R.id.hiddenButton);
+        visible = dialog.findViewById(R.id.visibleButton);
+        cancel = dialog.findViewById(R.id.cancelButton);
+        hidden.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonLayout.setVisibility(view.GONE);
+                //setButtonVisibility(view.GONE);
+                dialog.dismiss();
+            }
+        });
+        visible.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonLayout.setVisibility(view.VISIBLE);
+                //setButtonVisibility(view.VISIBLE);
+                dialog.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
 }
