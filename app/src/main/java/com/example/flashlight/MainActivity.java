@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -22,6 +23,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  *
@@ -29,12 +31,19 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView textView;
     private LinearLayout buttonLayout;
-    private LinearLayout layoutTest;
+    //private  LinearLayout popupLayout;
+
 
     private Button buttonBlack, buttonWhite, buttonRed, buttonGreen, buttonYellow;
     private Button hidden, visible, cancel;
 
     final Context context = this;
+
+    SharedPreferences pref;
+    SharedPreferences.Editor editor;
+
+
+    private boolean isDialogOpen = false;
 
     //private Menu menu;
     //private String versionInfo;
@@ -58,26 +67,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //init buttonLayout
         buttonLayout =(LinearLayout)findViewById(R.id.LayoutButtons);
 
+        //init popup
+        //popupLayout = (LinearLayout)findViewById(R.id.PopupLayout) ;
+
         //init all Buttons and tab on buttons
         initButtons();
 
         //open dialog
-        openDialog(context);
+        //openDialog(context);
+        pref = getSharedPreferences("hidden",
+                Context.MODE_PRIVATE);
 
         //On first start of the app
         if (savedInstanceState == null) {
             //set initial values on first start
             textView.setBackgroundColor(0);
             buttonLayout.setVisibility(View.VISIBLE);
+            //popupLayout.setVisibility(View.VISIBLE);
+            openDialog(context);
         } else {
             //read out all information stored
             textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));
             buttonLayout.setVisibility(savedInstanceState.getInt("visibilityButtons"));
             textView.setText(savedInstanceState.getCharSequence("visibilityText"));
+            boolean bool = pref.getBoolean("hidden",false);
+
+            //popupLayout.setVisibility(savedInstanceState.getInt("popup"));
+            if(savedInstanceState.getBoolean("popup")==false && pref.contains("hidden")==true && pref.contains("visible")==true) {
+            }
+            else {
+                openDialog(context);
+            }
+
+
         }
 
-
-        //layoutTest=(LinearLayout)findViewById(R.id.layouttest);
     }
 
 
@@ -161,9 +185,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //get visibility text
         CharSequence visText = textView.getText();
 
+        //get the popup window
+        boolean visPopup = isDialogOpen;
+
+
+        //save the values
         savedInstanceState.putInt("backgroundColor",color);
         savedInstanceState.putInt("visibilityButtons",visButtons);
         savedInstanceState.putCharSequence("visibilityText",visText);
+        savedInstanceState.putBoolean("popup",visPopup);
     }
 
     /**
@@ -223,14 +253,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.menu);
+        isDialogOpen = true;
         hidden = dialog.findViewById(R.id.hiddenButton);
         visible = dialog.findViewById(R.id.visibleButton);
         cancel = dialog.findViewById(R.id.cancelButton);
+        final SharedPreferences.Editor editor = pref.edit();
         hidden.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 buttonLayout.setVisibility(view.GONE);
-                //setButtonVisibility(view.GONE);
+                editor.putBoolean("hidden",true);
+                editor.commit();
+                isDialogOpen = false;
+                Toast.makeText(this, "Start Option has saved.", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -238,7 +273,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 buttonLayout.setVisibility(view.VISIBLE);
-                //setButtonVisibility(view.VISIBLE);
+                editor.putBoolean("visible",true);
+                editor.commit();
+                isDialogOpen = false;
                 dialog.dismiss();
             }
         });
@@ -250,5 +287,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         dialog.show();
     }
+/*
+    public void safeSharedPreference(){
+        pref = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        editor = pref.edit();
+        myEditor.clear();
+        int anzCodeLines = myStringArray.length;
+        for(int i = 0; i < anzCodeLines; i++){
+            myEditor.putString("myCode"+i, myStringArray[i]);
+        }
+        myEditor.putEditor.putInt("anzCodeLines", anzCodeLines);
+        myEditor.commit();
+        Toast.makeText(this, "Start Option has saved.", Toast.LENGTH_SHORT).show();
+    }
+    //Von Moritz
+    public void deleteSharedPreferences(){
+        mySavePref = getSharedPreferences("MYPreferences", MODE_PRIVATE);
+        myEditor.mySavePref.edit();
+        myEditor.clear();
+        myEditor.commit();
+        Toast.makeText(this, "The saved Start Option was deletet.", Toast.LENGTH_SHORT).show();
+    }
 
+    public void safeSharedPreference(){
+        myString = myText.getText().toString();
+        myStringArray = myString.split(",");
+        mySavePref = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        myEditor = mySavedPref.edit();
+//        myEditor.clear();
+        int anzCodeLines = myStringArray.length;
+        for(int i = 0; i < anzCodeLines; i++){
+            myEditor.putString("myCode"+i, myStringArray[i]);
+        }
+        myEditor.putEditor.putInt("anzCodeLines", anzCodeLines);
+        myEditor.commit();
+        Toast.makeText(this, "Start Option has saved.", Toast.LENGTH_SHORT).show();
+    }*/
 }
