@@ -1,23 +1,13 @@
 package com.example.flashlight;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.text.Layout;
-import android.view.ActionProvider;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -75,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //open dialog
         //openDialog(context);
-        pref = getSharedPreferences("hidden",
-                Context.MODE_PRIVATE);
+        //pref = getSharedPreferences("hidden",
+          //      Context.MODE_PRIVATE);
 
         //On first start of the app
         if (savedInstanceState == null) {
@@ -84,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             textView.setBackgroundColor(0);
             buttonLayout.setVisibility(View.VISIBLE);
             //popupLayout.setVisibility(View.VISIBLE);
-            openDialog(context);
+            //openDialog(context);
         } else {
             //read out all information stored
             textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));
@@ -96,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(savedInstanceState.getBoolean("popup")==false && pref.contains("hidden")==true && pref.contains("visible")==true) {
             }
             else {
-                openDialog(context);
+                //openDialog(context);
             }
 
 
@@ -118,50 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonRed.setOnClickListener(this);
         buttonYellow.setOnClickListener(this);
         buttonGreen.setOnClickListener(this);
-
     }
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-*/
-    /*
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
-        switch (item.getItemId()){
-            case R. id.hidden:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setPositiveButton("Hidden", null).create().show();
-                return true;
-            default:
-                return super.onMenuItemSelected(featureId, item);
-        }
-    }
-    */
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.hidden:
-                buttonLayout.setVisibility(View.INVISIBLE);
-                return true;
-            case R.id.visible:
-                buttonLayout.setVisibility(View.VISIBLE);
-                return true;
-            case R.id.cancel:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-     */
-
-
 
     /**
      *  This callback is called only when there is a saved instance that is previously saved by using
@@ -198,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      *
-     * @param view
      */
     @Override
     public void onClick(View view) { //Callback
@@ -248,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonLayout.setVisibility(view.GONE);
         }
     }
-
+/*
     public void openDialog(Context context) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
