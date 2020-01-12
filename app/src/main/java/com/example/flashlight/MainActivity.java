@@ -1,17 +1,31 @@
 package com.example.flashlight;
 
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.opengl.Visibility;
 import android.os.Bundle;
+import android.text.Layout;
+import android.view.ActionProvider;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +37,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout buttonLayout;
     //private  LinearLayout popupLayout;
 
+   // private View toDisplayInDialog = getLayoutInflater().inflate(R.layout.radiogroup, null);
+
 
     private Button buttonBlack, buttonWhite, buttonRed, buttonGreen, buttonYellow;
     private Button hidden, visible, cancel;
+    private Button setColor, cancelRadio;
 
     final Context context = this;
 
@@ -33,7 +50,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreferences.Editor editor;
 
 
+    private boolean isFirstStart = true;
+
     private boolean isDialogOpen = false;
+    private boolean isColorDialogOpen = false;
 
     //private Menu menu;
     //private String versionInfo;
@@ -44,13 +64,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     protected void onCreate(Bundle savedInstanceState) {
+
+        requestWindowFeature(getWindow().FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Make this activity, full screen
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        //        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         super.onCreate(savedInstanceState);
         //menu-points for drop down menu
         //super.onCreateOptionsMenu(menu);
+
+
+
         setContentView(R.layout.activity_main);
 
         //Init the Main Screen
         textView = findViewById(R.id.textView);
+
         //tap on background
         textView.setOnClickListener(this);
 
@@ -63,18 +95,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //init all Buttons and tab on buttons
         initButtons();
 
-        //open dialog
-        //openDialog(context);
         //pref = getSharedPreferences("hidden",
-          //      Context.MODE_PRIVATE);
+        //        Context.MODE_PRIVATE);
+        if(isFirstStart == true){
 
+            openColorDialog(context);
+            openDialog(context);
+            //editor.putInt("firstStart",1);
+            //editor.commit();
+
+            textView.setBackgroundColor(0);
+            buttonLayout.setVisibility(View.VISIBLE);
+
+            isFirstStart = false;
+          //  editor.putBoolean("first", false);
+
+
+           /*
+            if(savedInstanceState.getBoolean("popup")==false && pref.contains("hidden")==true && pref.contains("visible")==true) {
+            }
+            else {
+                openColorDialog((context));
+                openDialog(context);
+            }
+            isFirstStart = false;*/
+        }
+        else{
+            textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));
+            buttonLayout.setVisibility(savedInstanceState.getInt("visibilityButtons"));
+            textView.setText(savedInstanceState.getCharSequence("visibilityText"));
+            boolean bool = pref.getBoolean("hidden",false);
+        }
+/*
         //On first start of the app
         if (savedInstanceState == null) {
             //set initial values on first start
             textView.setBackgroundColor(0);
             buttonLayout.setVisibility(View.VISIBLE);
             //popupLayout.setVisibility(View.VISIBLE);
+
+            //openColorDialog((context));
             //openDialog(context);
+
         } else {
             //read out all information stored
             textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));
@@ -82,16 +144,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             textView.setText(savedInstanceState.getCharSequence("visibilityText"));
             boolean bool = pref.getBoolean("hidden",false);
 
+
+
             //popupLayout.setVisibility(savedInstanceState.getInt("popup"));
             if(savedInstanceState.getBoolean("popup")==false && pref.contains("hidden")==true && pref.contains("visible")==true) {
             }
             else {
-                //openDialog(context);
+                openColorDialog((context));
+                openDialog(context);
             }
+            */
 
-
-        }
-
+       // }
     }
 
 
@@ -108,7 +172,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonRed.setOnClickListener(this);
         buttonYellow.setOnClickListener(this);
         buttonGreen.setOnClickListener(this);
+
     }
+    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+*/
+    /*
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        switch (item.getItemId()){
+            case R. id.hidden:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setPositiveButton("Hidden", null).create().show();
+                return true;
+            default:
+                return super.onMenuItemSelected(featureId, item);
+        }
+    }
+    */
+    /*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.hidden:
+                buttonLayout.setVisibility(View.INVISIBLE);
+                return true;
+            case R.id.visible:
+                buttonLayout.setVisibility(View.VISIBLE);
+                return true;
+            case R.id.cancel:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+     */
+
+
 
     /**
      *  This callback is called only when there is a saved instance that is previously saved by using
@@ -145,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      *
+     * @param view
      */
     @Override
     public void onClick(View view) { //Callback
@@ -194,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonLayout.setVisibility(view.GONE);
         }
     }
-/*
+
     public void openDialog(Context context) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -203,15 +311,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hidden = dialog.findViewById(R.id.hiddenButton);
         visible = dialog.findViewById(R.id.visibleButton);
         cancel = dialog.findViewById(R.id.cancelButton);
-        final SharedPreferences.Editor editor = pref.edit();
+        //final SharedPreferences.Editor editor = pref.edit();
         hidden.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 buttonLayout.setVisibility(view.GONE);
-                editor.putBoolean("hidden",true);
-                editor.commit();
+               // editor.putBoolean("hidden",true);
+                //editor.commit();
                 isDialogOpen = false;
-                Toast.makeText(this, "Start Option has saved.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Start Option has saved.", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -219,13 +327,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 buttonLayout.setVisibility(view.VISIBLE);
-                editor.putBoolean("visible",true);
-                editor.commit();
+               // editor.putBoolean("visible",true);
+               // editor.commit();
                 isDialogOpen = false;
                 dialog.dismiss();
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public void openColorDialog(Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        final View toDisplayDialog = getLayoutInflater().inflate(R.layout.radiogroup, null);
+        dialog.setContentView(toDisplayDialog);
+
+        setColor = dialog.findViewById(R.id.setColorButton);
+        cancelRadio = dialog.findViewById((R.id.cancelRadioButton));
+
+        setColor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final RadioGroup myRadioGroup = (RadioGroup) toDisplayDialog.findViewById(R.id.radiobuttons);
+                final int radioGroupId = myRadioGroup.getCheckedRadioButtonId();
+                final RadioButton myCheckedButton = (RadioButton) toDisplayDialog.findViewById(radioGroupId);
+                int index = myRadioGroup.indexOfChild(myCheckedButton);
+
+                //editor.putInt("startupColor",index);
+                //editor.commit();
+
+
+                //pref = getSharedPreferences("startupColor",Context.MODE_PRIVATE);
+                //myRadioGroup.getChildAt(pref.getInt("startupColor",-1));
+                //myCheckedButton.setChecked (true);
+                //index = pref.getInt("startupColor",-1);
+                switch (index) {
+                    case 0:
+                        textView.setBackgroundColor(Color.WHITE);
+                        break;
+                    case 1:
+                        textView.setBackgroundColor(Color.BLACK);
+                        break;
+                    case 2:
+                        textView.setBackgroundColor(Color.RED);
+                        break;
+                    case 3:
+                        textView.setBackgroundColor(Color.YELLOW);
+                        toggle(view);
+                        break;
+                    case 4:
+                        textView.setBackgroundColor(Color.GREEN);
+                        break;
+                    default:
+                        break;
+                }
+                dialog.dismiss();
+            }
+        });
+        cancelRadio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
