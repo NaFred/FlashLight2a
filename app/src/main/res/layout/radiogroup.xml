@@ -27,16 +27,16 @@
         android:id="@+id/radiobuttons">
 
         <RadioButton
-            android:id="@+id/radioButton_Black"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Black" />
-
-        <RadioButton
             android:id="@+id/radioButton_White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="White" />
+
+        <RadioButton
+            android:id="@+id/radioButton_Black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Black" />
 
         <RadioButton
             android:id="@+id/radioButton_Red"

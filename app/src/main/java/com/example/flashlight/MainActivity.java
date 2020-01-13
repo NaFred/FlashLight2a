@@ -8,6 +8,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -100,6 +103,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //read out all information stored
             textView.setBackgroundColor(savedInstanceState.getInt("backgroundColor"));      //get shared pref
             buttonLayout.setVisibility(savedInstanceState.getInt("visibilityButtons"));
+            if(savedInstanceState.getInt("visibilityButtons")== View.VISIBLE) {
+                getSupportActionBar().show();
+            }
+            else{
+                getSupportActionBar().hide();
+            }
             textView.setText(savedInstanceState.getCharSequence("visibilityText"));
        }
     }
@@ -125,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void startFullscreen(){
         //start app without Title
+        //requestWindowFeature(getWindow().FEATURE_NO_TITLE);
         requestWindowFeature(getWindow().FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         //start app in fullscreen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -184,9 +195,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(buttonLayout.getVisibility()==view.GONE){
                     buttonLayout.setVisibility(view.VISIBLE);
                     textView.setText(" ");
+                    getSupportActionBar().show();
                 }else{
                     buttonLayout.setVisibility(view.GONE);
                     textView.setText(" ");
+                    getSupportActionBar().hide();
                 }
                 break;
         }
@@ -195,8 +208,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void toggle(View view){
         if(buttonLayout.getVisibility()==view.GONE){
             buttonLayout.setVisibility(view.VISIBLE);
+
         }else{
             buttonLayout.setVisibility(view.GONE);
+
         }
     }
 
@@ -245,6 +260,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setColor = dialog.findViewById(R.id.setColorButton);
         cancelRadio = dialog.findViewById((R.id.cancelRadioButton));
 
+        final RadioGroup myRadioGroup = (RadioGroup) toDisplayDialog.findViewById(R.id.radiobuttons);
+        final RadioButton myCheckedButton = (RadioButton) myRadioGroup.getChildAt(pref.getInt("startupColor",0));
+        myCheckedButton.setChecked(true);
+
         setColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,9 +272,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 final RadioButton myCheckedButton = (RadioButton) toDisplayDialog.findViewById(radioGroupId);
                 int index = myRadioGroup.indexOfChild(myCheckedButton);
 
-                //myRadioGroup.getChildAt(pref.getInt("startupColor",-1));
-                //myCheckedButton.setChecked (true);
+                //myRadioGroup.getChildAt(pref.getInt("startupColor",0));
                 //index = pref.getInt("startupColor",-1);
+
                 switch (index) {
                     case 0:
                         textView.setBackgroundColor(Color.WHITE);
@@ -275,6 +294,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     default:
                         break;
                 }
+                editor.putInt("startupColor",index);
+                editor.commit();
                 dialog.dismiss();
             }
         });
@@ -285,5 +306,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         dialog.show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menubuttons, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.startupcolor:
+                buttonLayout.setVisibility(View.INVISIBLE);
+                openColorDialog(context);
+                return true;
+            case R.id.startupvisibility:
+                buttonLayout.setVisibility(View.VISIBLE);
+                openDialog(context);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

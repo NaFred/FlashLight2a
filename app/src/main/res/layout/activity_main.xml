@@ -18,7 +18,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clickable="true"
-                android:text="Touch the screen to hide/unhide the buttons!"
+                android:text="Touch the screen to hide/unhide the buttons and menu!"
                 android:textSize="20dp"
                 android:orientation="vertical"
                 android:outlineProvider="background"
